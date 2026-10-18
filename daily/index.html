@@ -51,21 +51,50 @@ tr.me td{background:#3ddc8422}
 .modal h2{margin:0 0 6px;color:var(--gold)}
 pre.share{background:var(--panel2);border-radius:10px;padding:10px;text-align:left;white-space:pre-wrap;font-size:14px;margin:10px 0}
 .hidden{display:none!important}
+.gnav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:8px 8px;background:var(--panel);position:sticky;top:0;z-index:5;scrollbar-width:none}
+.gnav::-webkit-scrollbar{display:none}
+.gnav button{flex:0 0 auto;padding:8px 11px;font-size:14px;background:var(--panel2);border-radius:20px}
+.gnav button.on{background:var(--gold);color:#201600}
+.cell{position:relative}
+.cell.need::after{content:'';position:absolute;left:32%;top:32%;width:36%;height:36%;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);pointer-events:none}
+.cell.flash{animation:flash .28s ease-out}
+@keyframes flash{40%{transform:scale(.86)}}
+.nudge{color:var(--ok)}
+.row+.row{margin-top:8px}
+.gtitle{padding:12px 14px 0;text-align:center}.gtitle h2{margin:0;font-size:20px}
+.gstat{text-align:center;font-size:15px;min-height:22px;padding:6px 10px 0}
+.gstat b{color:var(--gold)}
+.ttt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;margin:8px 10px;background:var(--panel);border-radius:16px;touch-action:manipulation}
+.tcell{aspect-ratio:1;font-size:56px;line-height:1;padding:0;background:var(--panel2);border-radius:14px;color:var(--gold)}
+.tcell.o{color:#ff7a85}.tcell.win{background:#3ddc8444}
+#pongCv{display:block;width:calc(100% - 20px);margin:8px 10px;background:#05070c;border-radius:16px;touch-action:none;border:2px solid var(--panel2)}
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;margin:8px 10px;background:var(--panel);border-radius:16px;touch-action:manipulation}
+.mcard{aspect-ratio:3/4;font-size:36px;padding:0;background:var(--red);border-radius:12px}
+.mcard.up{background:var(--panel2)}.mcard.done{background:#3ddc8433}
+.whack{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px;margin:8px 10px;background:#123018;border-radius:16px;touch-action:manipulation}
+.hole{aspect-ratio:1;font-size:46px;padding:0;background:#3b2414;border-radius:50%;box-shadow:inset 0 8px 0 #0007}
+.hole.up{background:#5a3a20}
+.hole.hit{background:var(--ok)}
 footer{padding:14px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
 </style>
 </head>
 <body>
 <header><h1>🧩 BlockBros Daily</h1><span class="net">NILE TESTNET</span></header>
 <div class="notice">Testnet · free · no real money · no wallet needed to play</div>
+<nav class="gnav" id="gnav" aria-label="games">
+  <button data-pane="daily" class="on">🧩 Daily Puzzle</button><button data-pane="ttt">⭕ Tic-Tac-Toe</button><button data-pane="pong">🏓 Pong</button><button data-pane="mem">🃏 Memory</button><button data-pane="whack">🐹 Whack</button>
+</nav>
+<div class="pane" id="pane-daily">
 <div class="stats">
   <div>Puzzle<b id="pnum">#–</b></div>
   <div>Moves<b id="moves">0</b></div>
-  <div>Par<b id="par">–</b></div>
+  <div>Best<b id="par">–</b></div>
   <div>Streak<b id="streak">0</b></div>
 </div>
 <p class="intro" id="intro"></p>
 <div id="board" role="grid" aria-label="puzzle board"></div>
-<div class="row"><button class="alt" id="resetBtn">↺ Reset</button><button class="alt" id="hintBtn">💡 Hint (+1)</button><button class="alt" id="shareBtn2" disabled>📤 Share</button></div>
+<div class="row"><button class="alt" id="undoBtn">↶ Undo</button><button class="alt" id="resetBtn">↺ Reset</button><button class="alt" id="shareBtn2" disabled>📤 Share</button></div>
+<div class="row"><button class="alt" id="hintBtn">💡 Hint (+1)</button><button class="gold" id="guideBtn">🧭 Guide me (+1)</button></div>
 <p class="intro" id="nextIn"></p>
 
 <section id="lbSec">
@@ -104,6 +133,34 @@ footer{padding:14px;font-size:12px;color:var(--muted);text-align:center;line-hei
   <div class="muted" style="margin-bottom:8px">One card unlocks for each day you solve.</div>
   <div class="cards" id="cards"></div>
 </section>
+</div>
+
+<div class="pane hidden" id="pane-ttt">
+  <div class="gtitle"><h2>⭕ Tic-Tac-Toe</h2><div class="muted">You are ✖️. Get 3 in a row. The computer is a beginner.</div></div>
+  <div class="gstat" id="tttStat"></div>
+  <div class="ttt" id="tttBoard"></div>
+  <div class="row"><button class="gold" id="tttNew">↺ New game</button></div>
+  <div class="gstat muted" id="tttScore"></div>
+</div>
+<div class="pane hidden" id="pane-pong">
+  <div class="gtitle"><h2>🏓 Pong</h2><div class="muted">Drag your finger to move the gold paddle. First to 5 wins.</div></div>
+  <div class="gstat" id="pongStat"></div>
+  <canvas id="pongCv" width="300" height="400"></canvas>
+  <div class="row"><button class="gold" id="pongStart">▶ Start</button></div>
+</div>
+<div class="pane hidden" id="pane-mem">
+  <div class="gtitle"><h2>🃏 Memory</h2><div class="muted">Flip two cards at a time and find all 6 pairs.</div></div>
+  <div class="gstat" id="memStat"></div>
+  <div class="mem" id="memBoard"></div>
+  <div class="row"><button class="gold" id="memNew">↺ New game</button></div>
+</div>
+<div class="pane hidden" id="pane-whack">
+  <div class="gtitle"><h2>🐹 Whack-a-Mole</h2><div class="muted">Tap the moles before they hide. 30 seconds.</div></div>
+  <div class="gstat" id="whackStat"></div>
+  <div class="whack" id="whackBoard"></div>
+  <div class="row"><button class="gold" id="whackStart">▶ Start</button></div>
+</div>
+<p class="intro" id="miniNote" style="display:none">Just for fun while we build the real games. These don't use the blockchain. The leaderboard and the free badge are only for the Daily Puzzle.</p>
 
 <footer>Testnet only · free · no real money · no prizes. Badges are keepsakes only.<br>Never share your seed phrase or private key with anyone, including us.<br>Not financial advice. Built in public by @cypherpunx0x × @BlockBro808</footer>
 
@@ -269,29 +326,41 @@ function renderCards() {
 }
 
 // ---------- Board ----------
-let state = PUZ.board, seq = [], hints = 0, hintCell = -1;
+let state = PUZ.board, seq = [], hints = 0, hintCell = -1, guided = false, guidePaid = false;
 if (S.solved[TODAY]) { state = 0; seq = S.solved[TODAY].seq || []; hints = S.solved[TODAY].hints || 0; }
-else if (S.progress[TODAY]) { ({ state, seq, hints } = S.progress[TODAY]); }
+else if (S.progress[TODAY]) { ({ state, seq, hints } = S.progress[TODAY]); guided = !!S.progress[TODAY].guided; guidePaid = !!S.progress[TODAY].guidePaid; }
+const saveProg = () => { S.progress[TODAY] = { state, seq, hints, guided, guidePaid }; save(); };
 const cells = [];
 for (let i = 0; i < CELLS; i++) { const b = document.createElement('button'); b.className = 'cell'; b.setAttribute('aria-label', 'tile ' + (i + 1));
   b.addEventListener('click', () => press(i)); $('board').appendChild(b); cells.push(b); }
 function renderBoard() {
   const done = !!S.solved[TODAY];
-  cells.forEach((b, i) => { b.classList.toggle('on', !!(state & (1 << i))); b.classList.toggle('hint', i === hintCell); b.disabled = done; });
+  const need = guided && !done && state ? solve(state) : 0;
+  cells.forEach((b, i) => { b.classList.toggle('on', !!(state & (1 << i))); b.classList.toggle('hint', i === hintCell); b.classList.toggle('need', need > 0 && !!(need & (1 << i))); b.disabled = done; });
   $('moves').textContent = seq.length + (hints ? `+${hints}` : ''); $('par').textContent = PUZ.par; $('pnum').textContent = '#' + NUM; $('streak').textContent = streakNow();
-  $('shareBtn2').disabled = !done; $('hintBtn').disabled = done; $('resetBtn').disabled = done;
+  $('shareBtn2').disabled = !done; $('hintBtn').disabled = done || guided; $('resetBtn').disabled = done; $('undoBtn').disabled = done || !seq.length;
+  $('guideBtn').disabled = done; $('guideBtn').textContent = guided ? '🧭 Guide is on ✓' : (guidePaid ? '🧭 Guide me' : '🧭 Guide me (+1)');
+  const left = popcount(state), toGo = need > 0 ? popcount(need) : 0;
+  const nudge = guided ? `<span class="nudge">Just tap the <b>green dots</b>${toGo ? ` (${toGo} to go)` : ''}.</span>`
+    : seq.length >= MAX_MOVES - 10 ? `<span class="nudge">That's a lot of moves (scores over ${MAX_MOVES} can't go on the leaderboard). Try ↺ Reset or 🧭 Guide me.</span>`
+    : seq.length >= PUZ.par + 5 ? '<span class="nudge">Stuck? Tap <b>🧭 Guide me</b> and it shows you exactly which tiles to tap.</span>' : '';
   $('intro').innerHTML = done ? `✅ Solved in <b>${seq.length}</b> moves${hints ? ` + ${hints} hint${hints > 1 ? 's' : ''}` : ''}. New puzzle every day at 00:00 UTC (2:00 PM Hawaii).`
-    : 'Turn <b>all the lights off</b>. Tapping a tile flips it and its neighbors (up, down, left, right). Same puzzle for everyone today.';
+    : `<b>Goal: turn all the lights off.</b> Tap a tile and it flips, plus the tiles above, below, left and right. Mis-tap? Use ↶ Undo.<br>💡 Lights on: <b>${left}</b>${nudge ? '<br>' + nudge : ''}`;
 }
 function press(i) {
   if (S.solved[TODAY]) return;
   state ^= MASKS[i]; seq.push(i); hintCell = -1;
-  S.progress[TODAY] = { state, seq, hints }; save(); renderBoard();
+  for (let j = 0; j < CELLS; j++) if (MASKS[i] & (1 << j)) { const c = cells[j]; c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
+  saveProg(); renderBoard();
   if (state === 0) onSolved();
 }
-$('resetBtn').onclick = () => { if (S.solved[TODAY]) return; state = PUZ.board; seq = []; hintCell = -1; S.progress[TODAY] = { state, seq, hints }; save(); renderBoard(); };
+$('resetBtn').onclick = () => { if (S.solved[TODAY]) return; state = PUZ.board; seq = []; hintCell = -1; saveProg(); renderBoard(); };
+// Undo is free: the contract replays the remaining taps, and XOR means removing the last tap gives exactly the previous board.
+$('undoBtn').onclick = () => { if (S.solved[TODAY] || !seq.length) return; state ^= MASKS[seq.pop()]; hintCell = -1; saveProg(); renderBoard(); };
+// Guide mode: green dots on every tile still needed (recomputed after each tap). Costs +1 hint once per day, so the score stays honest.
+$('guideBtn').onclick = () => { if (S.solved[TODAY]) return; guided = !guided; if (guided && !guidePaid) { guidePaid = true; hints++; } hintCell = -1; saveProg(); renderBoard(); };
 $('hintBtn').onclick = () => { if (S.solved[TODAY] || !state) return; const sol = solve(state); if (sol < 0) return;
-  for (let i = 0; i < CELLS; i++) if (sol & (1 << i)) { hintCell = i; break; } hints++; S.progress[TODAY] = { state, seq, hints }; save(); renderBoard(); };
+  for (let i = 0; i < CELLS; i++) if (sol & (1 << i)) { hintCell = i; break; } hints++; saveProg(); renderBoard(); };
 
 function pageUrl() { return /^https?:/.test(location.protocol) ? location.origin + location.pathname : 'blockbros808.github.io'; }
 function myShare() { return shareText({ num: NUM, date: dayToDate(TODAY), moves: seq.length, par: PUZ.par, hints, streak: streakNow(), rank: myRank[TODAY], url: pageUrl() }); }
@@ -499,9 +568,178 @@ $('connectBtn').onclick = connect;
 window.addEventListener('message', (e) => { const a = e.data && e.data.message && e.data.message.action;
   if (account && (a === 'setAccount' || a === 'setNode' || a === 'accountsChanged')) connect(); });
 
-window.__pz = { PUZ, TODAY, get state() { return state; }, get seq() { return seq; }, press, solve, S };
+window.__pz = { PUZ, TODAY, get state() { return state; }, get seq() { return seq; }, get hints() { return hints; }, press, solve, S };
 save(); renderBoard(); renderCards(); tick(); setInterval(tick, 30000); readSponsor(); renderLeaderboard(); renderBadge(); setInterval(renderLeaderboard, 60000);
 (async () => { for (let i = 0; i < 20 && !hasTronLink(); i++) await sleep(150); renderSubmit(); })();
+})();
+</script>
+<script id="mini">
+// ---------- Mini games: just for fun, no wallet, no blockchain. Placeholders until the real BlockBros games load. ----------
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const KEY = 'bbmini.v1';
+const M = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
+const saveM = () => { try { localStorage.setItem(KEY, JSON.stringify(M)); } catch {} };
+const rnd = (n) => Math.floor(Math.random() * n);
+const mini = window.__mini = {};
+
+// ---------- Menu ----------
+let pane = 'daily';
+function show(name) {
+  pane = name;
+  document.querySelectorAll('#gnav button').forEach(b => b.classList.toggle('on', b.dataset.pane === name));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('hidden', p.id !== 'pane-' + name));
+  $('miniNote').style.display = name === 'daily' ? 'none' : '';
+  if (name !== 'pong') pong.pause(); else pong.draw();
+  if (name !== 'whack') whack.stop(false);
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#gnav button').forEach(b => b.onclick = () => show(b.dataset.pane));
+mini.show = show;
+
+// ---------- Tic-Tac-Toe (beginner AI: sometimes wins/blocks, otherwise random) ----------
+const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const T = mini.ttt = { b: Array(9).fill(''), over: false, turn: 'X', youFirst: true, line: null, result: '' };
+M.ttt = M.ttt || { w: 0, l: 0, d: 0 };
+const tcells = [];
+for (let i = 0; i < 9; i++) { const c = document.createElement('button'); c.className = 'tcell'; c.setAttribute('aria-label', 'square ' + (i + 1)); c.onclick = () => tttTap(i); $('tttBoard').appendChild(c); tcells.push(c); }
+function tttWinner(b) { for (const l of LINES) if (b[l[0]] && b[l[0]] === b[l[1]] && b[l[0]] === b[l[2]]) return { who: b[l[0]], line: l }; return b.every(Boolean) ? { who: 'draw' } : null; }
+function findLine(who) { for (const l of LINES) { const v = l.map(i => T.b[i]); if (v.filter(x => x === who).length === 2 && v.includes('')) return l[v.indexOf('')]; } return -1; }
+function aiPick() {
+  const empty = T.b.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+  const win = findLine('O'); if (win >= 0 && Math.random() < 0.6) return win;     // takes a win only 60% of the time
+  const block = findLine('X'); if (block >= 0 && Math.random() < 0.5) return block; // blocks only half the time
+  return empty[rnd(empty.length)];
+}
+function tttCheck() {
+  const r = tttWinner(T.b); if (!r) return false;
+  T.over = true; T.line = r.line || null; T.result = r.who === 'X' ? 'win' : r.who === 'O' ? 'lose' : 'draw';
+  M.ttt[T.result[0]]++; saveM(); return true;
+}
+function tttAi() { if (T.over) return; T.b[aiPick()] = 'O'; T.turn = 'X'; tttCheck(); tttRender(); }
+function tttTap(i) {
+  if (T.over || T.turn !== 'X' || T.b[i]) return;
+  T.b[i] = 'X'; if (tttCheck()) return tttRender();
+  T.turn = 'O'; tttRender(); setTimeout(tttAi, 350);
+}
+function tttNew() {
+  T.b = Array(9).fill(''); T.over = false; T.line = null; T.result = ''; T.youFirst = !T.youFirst;
+  T.turn = T.youFirst ? 'X' : 'O'; tttRender(); if (!T.youFirst) setTimeout(tttAi, 450);
+}
+function tttRender() {
+  tcells.forEach((c, i) => { c.textContent = T.b[i] === 'X' ? '✖' : T.b[i] === 'O' ? '◯' : ''; c.classList.toggle('o', T.b[i] === 'O'); c.classList.toggle('win', !!(T.line && T.line.includes(i))); c.disabled = T.over; });
+  $('tttStat').innerHTML = T.result === 'win' ? '🎉 <b>You win!</b> Tap New game to play again.' : T.result === 'lose' ? '🤖 The computer got 3 in a row. Try again!'
+    : T.result === 'draw' ? '🤝 It\'s a draw.' : T.turn === 'X' ? 'Your turn: tap a square.' : '🤖 Computer is thinking…';
+  $('tttScore').textContent = `You ${M.ttt.w} · Computer ${M.ttt.l} · Draws ${M.ttt.d}`;
+}
+$('tttNew').onclick = tttNew; T.youFirst = false; tttNew();
+
+// ---------- Pong (drag to move; easy, slow AI; first to 5) ----------
+const cv = $('pongCv'), g = cv.getContext('2d'), W = cv.width, H = cv.height, WIN_AT = 5;
+const P = mini.pong = { you: 0, cpu: 0, running: false, over: false, speed: 1, px: W / 2, cx: W / 2, bx: W / 2, by: H / 2, vx: 0, vy: 0, wait: 0, raf: 0, last: 0, aim: 0 };
+const PW = 76, CW = 60, PH = 10, BR = 7, PY = H - 26, CY = 16;
+function serve(dir) { P.bx = W / 2; P.by = H / 2; const a = (Math.random() - 0.5) * 1.2; P.vx = Math.sin(a) * 3; P.vy = dir * 3; P.wait = 45; P.aim = (Math.random() - 0.5) * (CW + 30); }
+function pongStep() {
+  if (P.wait > 0) { P.wait--; return; }
+  P.bx += P.vx; P.by += P.vy;
+  if (P.bx < BR) { P.bx = BR; P.vx = Math.abs(P.vx); } if (P.bx > W - BR) { P.bx = W - BR; P.vx = -Math.abs(P.vx); }
+  // computer: slow, and only chases the ball when it is coming its way
+  const target = P.vy < 0 ? P.bx + P.aim : W / 2, aiMax = 2.1;   // P.aim: random aim error per shot, so it misses sometimes
+  P.cx += Math.max(-aiMax, Math.min(aiMax, target - P.cx));
+  const hit = (padX, padW, y, dir) => { if (Math.abs(P.bx - padX) <= padW / 2 + BR && (dir > 0 ? P.by + BR >= y && P.by < y + PH : P.by - BR <= y + PH && P.by > y)) {
+    const off = (P.bx - padX) / (padW / 2), sp = Math.min(6.5, Math.hypot(P.vx, P.vy) * 1.05);
+    P.vx = off * sp * 0.75; if (Math.abs(P.vx) < 0.8) P.vx = (P.vx < 0 || (!P.vx && Math.random() < 0.5) ? -1 : 1) * 0.8;
+    P.vy = -dir * Math.sqrt(Math.max(1, sp * sp - P.vx * P.vx)); P.by = dir > 0 ? y - BR : y + PH + BR; if (dir > 0) P.aim = (Math.random() - 0.5) * (CW + 30); } };
+  if (P.vy > 0) hit(P.px, PW, PY, 1); else hit(P.cx, CW, CY, -1);
+  if (P.by > H + BR) { P.cpu++; point(1); } else if (P.by < -BR) { P.you++; point(-1); }
+}
+function point(dir) {
+  if (P.you >= WIN_AT || P.cpu >= WIN_AT) { P.over = true; P.running = false;
+    M.pong = M.pong || { w: 0, l: 0 }; M.pong[P.you > P.cpu ? 'w' : 'l']++; saveM(); $('pongStart').textContent = '▶ Play again'; }
+  else serve(dir);
+  pongStat();
+}
+function pongStat() {
+  $('pongStat').innerHTML = P.over ? (P.you > P.cpu ? `🎉 <b>You win ${P.you}–${P.cpu}!</b>` : `🤖 Computer wins ${P.cpu}–${P.you}. Try again!`)
+    : `You <b>${P.you}</b> · Computer <b>${P.cpu}</b>${P.running ? '' : (P.you || P.cpu ? ' · paused' : ' · tap Start')}`;
+}
+function rr(x, y, w, h, c) { g.fillStyle = c; g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, 5) : g.rect(x, y, w, h); g.fill(); }
+function draw() {
+  g.fillStyle = '#05070c'; g.fillRect(0, 0, W, H);
+  g.strokeStyle = '#ffffff22'; g.setLineDash([8, 8]); g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2); g.stroke(); g.setLineDash([]);
+  g.fillStyle = '#ffffff18'; g.font = 'bold 64px system-ui,sans-serif'; g.textAlign = 'center'; g.fillText(P.cpu, W / 2, H / 2 - 40); g.fillText(P.you, W / 2, H / 2 + 88);
+  rr(P.cx - CW / 2, CY, CW, PH, '#d7263d'); rr(P.px - PW / 2, PY, PW, PH, '#ffc83c');
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(P.bx, P.by, BR, 0, Math.PI * 2); g.fill();
+}
+function loop(ts) {
+  if (!P.running) return;
+  const frames = Math.min(4, Math.max(1, Math.round((ts - (P.last || ts - 16.7)) / 16.7))); P.last = ts;
+  for (let i = 0; i < frames * P.speed && P.running; i++) pongStep();
+  draw(); if (P.running) P.raf = requestAnimationFrame(loop);
+}
+function pongStart() {
+  if (P.over || (!P.you && !P.cpu && !P.vy)) { P.you = 0; P.cpu = 0; P.over = false; P.px = P.cx = W / 2; serve(Math.random() < 0.5 ? 1 : -1); }
+  P.running = true; P.last = 0; $('pongStart').textContent = '⏸ Pause'; pongStat(); cancelAnimationFrame(P.raf); P.raf = requestAnimationFrame(loop);
+}
+P.pause = () => { if (!P.running) return; P.running = false; cancelAnimationFrame(P.raf); $('pongStart').textContent = '▶ Resume'; pongStat(); draw(); };
+P.draw = draw;
+$('pongStart').onclick = () => P.running ? P.pause() : pongStart();
+function movePaddle(e) { const r = cv.getBoundingClientRect(); P.px = Math.max(PW / 2, Math.min(W - PW / 2, (e.clientX - r.left) / r.width * W)); if (!P.running) draw(); }
+cv.addEventListener('pointerdown', (e) => { movePaddle(e); if (!P.running && !P.over) pongStart(); });
+cv.addEventListener('pointermove', movePaddle);
+document.addEventListener('keydown', (e) => { if (pane !== 'pong') return; if (e.key === 'ArrowLeft') P.px = Math.max(PW / 2, P.px - 18); if (e.key === 'ArrowRight') P.px = Math.min(W - PW / 2, P.px + 18); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) P.pause(); });
+const pong = P; pongStat(); draw();
+
+// ---------- Memory (6 pairs, TRON 101 emojis) ----------
+const EMO = ['💎', '🪙', '⚡', '🔒', '👛', '🧱'];
+const Mm = mini.mem = { deck: [], up: [], done: new Set(), tries: 0, lock: false, won: false };
+function memNew() {
+  Mm.deck = EMO.concat(EMO); for (let i = Mm.deck.length - 1; i > 0; i--) { const j = rnd(i + 1); [Mm.deck[i], Mm.deck[j]] = [Mm.deck[j], Mm.deck[i]]; }
+  Mm.up = []; Mm.done = new Set(); Mm.tries = 0; Mm.lock = false; Mm.won = false;
+  $('memBoard').innerHTML = ''; Mm.deck.forEach((_, i) => { const c = document.createElement('button'); c.className = 'mcard'; c.setAttribute('aria-label', 'card ' + (i + 1)); c.onclick = () => memTap(i); $('memBoard').appendChild(c); });
+  memRender();
+}
+function memTap(i) {
+  if (Mm.lock || Mm.done.has(i) || Mm.up.includes(i)) return;
+  Mm.up.push(i); memRender();
+  if (Mm.up.length < 2) return;
+  Mm.tries++; const [a, b] = Mm.up;
+  if (Mm.deck[a] === Mm.deck[b]) { Mm.done.add(a); Mm.done.add(b); Mm.up = [];
+    if (Mm.done.size === Mm.deck.length) { Mm.won = true; M.memBest = Math.min(M.memBest || 99, Mm.tries); saveM(); } memRender(); }
+  else { Mm.lock = true; setTimeout(() => { Mm.up = []; Mm.lock = false; memRender(); }, 750); }
+}
+function memRender() {
+  [...$('memBoard').children].forEach((c, i) => { const up = Mm.up.includes(i) || Mm.done.has(i); c.textContent = up ? Mm.deck[i] : ''; c.classList.toggle('up', up); c.classList.toggle('done', Mm.done.has(i)); });
+  $('memStat').innerHTML = Mm.won ? `🎉 <b>All pairs found in ${Mm.tries} tries!</b>${M.memBest ? ` Best: ${M.memBest}` : ''}`
+    : `Pairs <b>${Mm.done.size / 2}</b>/6 · Tries <b>${Mm.tries}</b>${M.memBest ? ` · Best ${M.memBest}` : ''}`;
+}
+$('memNew').onclick = memNew; memNew();
+
+// ---------- Whack-a-Mole (30 s, slow moles, no penalty for misses) ----------
+const Wk = mini.whack = { score: 0, left: 0, mole: -1, running: false, timer: 0, moleT: 0, hitAt: -1, ended: false };
+const holes = [];
+for (let i = 0; i < 9; i++) { const h = document.createElement('button'); h.className = 'hole'; h.setAttribute('aria-label', 'hole ' + (i + 1)); h.onclick = () => whackTap(i); $('whackBoard').appendChild(h); holes.push(h); }
+function popMole() { let n; do n = rnd(9); while (n === Wk.mole); Wk.mole = n; Wk.moleT = 11; Wk.hitAt = -1; }  // stays up ~1.1 s
+function whackTap(i) { if (!Wk.running || i !== Wk.mole) return; Wk.score++; Wk.hitAt = i; Wk.mole = -1; Wk.moleT = 4; whackRender(); }
+function whackTick() {
+  Wk.left = Math.max(0, Wk.left - 0.1);
+  if (--Wk.moleT <= 0) { if (Wk.mole >= 0 || Wk.hitAt >= 0 || Wk.moleT <= 0) popMole(); }
+  if (Wk.left <= 0) whack.stop(true);
+  whackRender();
+}
+function whackRender() {
+  holes.forEach((h, i) => { h.textContent = i === Wk.mole ? '🐹' : i === Wk.hitAt ? '💥' : ''; h.classList.toggle('up', i === Wk.mole); h.classList.toggle('hit', i === Wk.hitAt); });
+  $('whackStat').innerHTML = Wk.running ? `Score <b>${Wk.score}</b> · ⏱ ${Wk.left.toFixed(1)}s`
+    : Wk.ended ? `🎉 Time! You got <b>${Wk.score}</b>${M.whackBest ? ` · Best ${M.whackBest}` : ''}` : `Tap Start, then tap the moles.${M.whackBest ? ` Best ${M.whackBest}` : ''}`;
+}
+const whack = Wk;
+Wk.start = () => { clearInterval(Wk.timer); Wk.score = 0; Wk.left = 30; Wk.running = true; Wk.ended = false; Wk.mole = -1; Wk.hitAt = -1; Wk.moleT = 5; Wk.timer = setInterval(whackTick, 100); $('whackStart').textContent = '↺ Restart'; whackRender(); };
+Wk.stop = (finished) => { if (!Wk.running) return; clearInterval(Wk.timer); Wk.running = false; Wk.mole = -1; Wk.hitAt = -1;
+  if (finished) { Wk.ended = true; M.whackBest = Math.max(M.whackBest || 0, Wk.score); saveM(); }
+  $('whackStart').textContent = '▶ Start'; whackRender(); };
+$('whackStart').onclick = Wk.start; whackRender();
 })();
 </script>
 </body>
