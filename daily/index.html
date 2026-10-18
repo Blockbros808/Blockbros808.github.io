@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>BlockBros Daily Puzzle · No TRX needed</title>
+<!-- Bridge step 1: a daily puzzle anyone can play with NO wallet and NO TRX, plus an on-chain leaderboard and an optional free daily badge.
+     TRON Nile TESTNET only. No private keys in this file. Signing happens only inside the player's TronLink. -->
+<style>
+:root{--red:#d7263d;--gold:#ffc83c;--bg:#0e1117;--panel:#1a1f2e;--panel2:#242a3d;--text:#f2f4f8;--muted:#a8afbf;--ok:#3ddc84;--off:#2a3048}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{max-width:520px;margin:0 auto;padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 16px)}
+header{background:var(--red);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:18px;margin:0}
+.net{font-size:11px;background:#0008;padding:3px 8px;border-radius:10px;white-space:nowrap}
+.notice{background:#3a2c00;color:var(--gold);font-size:13px;padding:7px 12px;text-align:center;border-bottom:1px solid #6b5300}
+.stats{display:flex;justify-content:space-around;padding:8px 4px;font-size:13px;background:var(--panel);text-align:center}
+.stats b{display:block;color:var(--gold);font-size:19px}
+.intro{padding:10px 14px 0;font-size:14px;color:var(--muted);text-align:center;line-height:1.35}
+#board{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:12px;margin:8px 10px;background:var(--panel);border-radius:16px;touch-action:manipulation}
+.cell{aspect-ratio:1;border:0;border-radius:12px;background:var(--off);box-shadow:inset 0 -4px 0 #0005;cursor:pointer;transition:background .12s,transform .08s;padding:0;min-width:0}
+.cell.on{background:radial-gradient(circle at 40% 35%,#fff6c8,var(--gold) 45%,#e09a00);box-shadow:0 0 14px #ffc83c88,inset 0 -4px 0 #0003}
+.cell:active{transform:scale(.93)}
+.cell.hint{outline:4px solid var(--ok);outline-offset:-4px}
+.row{display:flex;gap:8px;padding:0 10px}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 14px;font-size:16px;cursor:pointer;color:#fff;background:var(--red)}
+button.alt{background:var(--panel2)} button.gold{background:var(--gold);color:#201600}
+button:disabled{opacity:.45;cursor:default}
+.row button{flex:1}
+section{background:var(--panel);margin:12px 10px 0;border-radius:14px;padding:12px}
+section h3{margin:0 0 8px;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.muted{color:var(--muted);font-size:13px;line-height:1.4}
+.tabs{display:flex;gap:6px}.tabs button{padding:6px 10px;font-size:13px;background:var(--panel2)}.tabs button.on{background:var(--gold);color:#201600}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:7px 4px;text-align:left;border-bottom:1px solid #ffffff12}
+th{color:var(--muted);font-weight:600;font-size:12px}
+td.r{color:var(--gold);font-weight:800;width:34px} td.s{font-weight:800;text-align:right} th.s{text-align:right}
+tr.me td{background:#3ddc8422}
+.addr{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
+.you{margin-top:8px;font-size:14px}
+.cards{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--panel2);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.4}
+.card b{color:var(--gold)} .card.locked{opacity:.55}
+#msg{min-height:18px;margin-top:8px;font-size:14px;line-height:1.35;word-break:break-word}
+#msg.err{color:#ff7a85} #msg.ok{color:var(--ok)} #msg a,.howto a{color:var(--gold)}
+.howto ol{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.5}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.modal .box{background:var(--panel);border-radius:18px;padding:18px;max-width:440px;width:100%;text-align:center;max-height:92vh;overflow:auto}
+.modal h2{margin:0 0 6px;color:var(--gold)}
+pre.share{background:var(--panel2);border-radius:10px;padding:10px;text-align:left;white-space:pre-wrap;font-size:14px;margin:10px 0}
+.hidden{display:none!important}
+footer{padding:14px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+<header><h1>🧩 BlockBros Daily</h1><span class="net">NILE TESTNET</span></header>
+<div class="notice">Testnet · free · no real money · no wallet needed to play</div>
+<div class="stats">
+  <div>Puzzle<b id="pnum">#–</b></div>
+  <div>Moves<b id="moves">0</b></div>
+  <div>Par<b id="par">–</b></div>
+  <div>Streak<b id="streak">0</b></div>
+</div>
+<p class="intro" id="intro"></p>
+<div id="board" role="grid" aria-label="puzzle board"></div>
+<div class="row"><button class="alt" id="resetBtn">↺ Reset</button><button class="alt" id="hintBtn">💡 Hint (+1)</button><button class="alt" id="shareBtn2" disabled>📤 Share</button></div>
+<p class="intro" id="nextIn"></p>
+
+<section id="lbSec">
+  <h3><span>🏆 TRON leaderboard</span><span class="tabs"><button id="tabToday" class="on">Today</button><button id="tabYest">Yesterday</button></span></h3>
+  <div class="muted" id="lbNote">Fewest moves wins. Each hint adds +1. Ties go to whoever submitted first. Read live from the Nile testnet, so no wallet is needed to view.</div>
+  <div id="lbTable" class="muted" style="margin-top:8px">Loading…</div>
+  <div class="you" id="you"></div>
+</section>
+
+<section id="submitSec">
+  <h3>⛓️ On-chain extras (optional, free)</h3>
+  <div class="muted" id="submitState"></div>
+  <div class="muted" id="badgeInfo" style="margin-top:6px"></div>
+  <div id="noWallet" class="howto hidden">
+    <div class="muted">To put your score on TRON's Nile testnet, open this page inside the <b>TronLink app</b>:</div>
+    <ol>
+      <li>Install <b>TronLink</b> and create a wallet. <b>Write your seed phrase on paper. Never share it.</b></li>
+      <li>In TronLink, switch the node to <b>Nile Testnet</b> (Settings → Node).</li>
+      <li>Open <b>Discover / DApp browser</b>, paste this page's link, and open it.</li>
+      <li>Tap <b>Connect TronLink</b>, then <b>Submit score</b> and/or <b>Claim today's free badge</b>.</li>
+    </ol>
+    <div class="row" style="padding:8px 0 0"><button class="alt" id="copyLinkBtn">📋 Copy page link</button></div>
+  </div>
+  <div id="walletBox" class="hidden">
+    <button class="alt" id="connectBtn" style="width:100%">🔗 Connect TronLink</button>
+    <div id="acct" class="muted hidden" style="margin-top:8px">Wallet: <span class="addr" id="addr"></span></div>
+    <div id="submitBtns" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
+  </div>
+  <div class="muted" style="margin-top:8px">BlockBros' test sponsor pays the energy (<span id="sponsor">checking…</span>), so your wallet pays no energy. The leaderboard and the badge share one sponsor. A brand-new wallet has to be <b>activated</b> once first (1.1 TRX, the real "10 TRX wall"); our next build will do that for you. The leaderboard contract replays your taps to check the puzzle is really solved.</div>
+  <div class="muted" style="margin-top:6px">🎖️ <b>Daily badge</b>: a free keepsake, one per wallet per UTC day. It's a record inside the BlockBros badge contract, <b>not a token or NFT</b>: it has no transfer or sell function, no cash value, and no prize. The contract counts your badges and your streak. It doesn't re-check the puzzle (that's the leaderboard's job), so this page only offers it after you solve.</div>
+  <div id="msg"></div>
+</section>
+
+<section>
+  <h3><span>📚 TRON 101 <span class="muted" id="cardCount"></span></span></h3>
+  <div class="muted" style="margin-bottom:8px">One card unlocks for each day you solve.</div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<footer>Testnet only · free · no real money · no prizes. Badges are keepsakes only.<br>Never share your seed phrase or private key with anyone, including us.<br>Not financial advice. Built in public by @cypherpunx0x × @BlockBro808</footer>
+
+<div class="modal hidden" id="solvedModal"><div class="box">
+  <h2>🎉 Solved!</h2>
+  <div id="solvedText"></div>
+  <pre class="share" id="shareText"></pre>
+  <div class="row" style="padding:0"><button class="gold" id="shareBtn">📤 Copy result</button><button class="alt" id="closeSolved">Next</button></div>
+</div></div>
+<div class="modal hidden" id="cardModal"><div class="box">
+  <h2>📚 New TRON 101 card!</h2>
+  <div class="card" id="cardNew" style="text-align:left;margin:10px 0"></div>
+  <button class="alt" id="closeCard" style="width:100%">Got it</button>
+</div></div>
+
+<script id="core">
+// ---------- Pure puzzle logic (also used by test/solver_check.mjs and evmtest/test_lb.mjs) ----------
+const N = 5, CELLS = 25;
+const LAUNCH_DAY = 20744;                        // 2026-10-18 UTC = Puzzle #1
+const MAX_MOVES = 60;                            // contract limit for one submit
+function utcDay(ms) { return Math.floor(ms / 86400000); }
+function dayToDate(d) { return new Date(d * 86400000).toISOString().slice(0, 10); }
+// Compact Keccak-256 (Ethereum/TRON flavor) using BigInt lanes. Fine for a few hashes per page load.
+function keccak256(bytes) {
+  const M = (1n << 64n) - 1n, RC = [], R = [0,1,62,28,27,36,44,6,55,20,3,10,43,25,39,41,45,15,21,8,18,2,61,56,14];
+  let l = 1n; for (let i = 0; i < 24; i++) { let c = 0n; for (let j = 0; j < 7; j++) { if (l & 1n) c |= 1n << ((1n << BigInt(j)) - 1n); l = (l << 1n) ^ ((l >> 7n) * 0x71n); l &= 0xffn; } RC.push(c); }
+  const rot = (x, n) => n ? ((x << BigInt(n)) | (x >> BigInt(64 - n))) & M : x;
+  const s = new Array(25).fill(0n), rate = 136, p = Array.from(bytes); p.push(1); while (p.length % rate) p.push(0); p[p.length - 1] |= 0x80;
+  for (let o = 0; o < p.length; o += rate) {
+    for (let i = 0; i < rate / 8; i++) { let v = 0n; for (let b = 7; b >= 0; b--) v = (v << 8n) | BigInt(p[o + i * 8 + b]); s[i] ^= v; }
+    for (let r = 0; r < 24; r++) {
+      const C = [0,1,2,3,4].map(x => s[x] ^ s[x+5] ^ s[x+10] ^ s[x+15] ^ s[x+20]);
+      for (let x = 0; x < 5; x++) { const d = C[(x+4)%5] ^ rot(C[(x+1)%5], 1); for (let y = 0; y < 25; y += 5) s[x+y] ^= d; }
+      const B = new Array(25); for (let x = 0; x < 5; x++) for (let y = 0; y < 5; y++) B[y + 5 * ((2*x + 3*y) % 5)] = rot(s[x + 5*y], R[x + 5*y]);
+      for (let i = 0; i < 25; i++) s[i] = B[i] ^ ((~B[(i%5+1)%5 + i - i%5] & M) & B[(i%5+2)%5 + i - i%5]);
+      s[0] ^= RC[r];
+    }
+  }
+  const out = []; for (let i = 0; i < 4; i++) for (let b = 0; b < 8; b++) out.push(Number((s[i] >> BigInt(8*b)) & 0xffn)); return out;
+}
+function sha256(bytes) {
+  const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const p = Array.from(bytes), L = p.length * 8; p.push(0x80); while (p.length % 64 !== 56) p.push(0);
+  for (let i = 7; i >= 0; i--) p.push(i > 3 ? 0 : (L >>> (i * 8)) & 0xff);
+  const rr = (x, n) => (x >>> n) | (x << (32 - n));
+  for (let o = 0; o < p.length; o += 64) {
+    const w = []; for (let i = 0; i < 16; i++) w[i] = (p[o+4*i] << 24) | (p[o+4*i+1] << 16) | (p[o+4*i+2] << 8) | p[o+4*i+3];
+    for (let i = 16; i < 64; i++) { const s0 = rr(w[i-15],7) ^ rr(w[i-15],18) ^ (w[i-15] >>> 3), s1 = rr(w[i-2],17) ^ rr(w[i-2],19) ^ (w[i-2] >>> 10); w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0; }
+    let [a,b,c,d,e,f,g,h] = H;
+    for (let i = 0; i < 64; i++) { const t1 = (h + (rr(e,6) ^ rr(e,11) ^ rr(e,25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0, t2 = ((rr(a,2) ^ rr(a,13) ^ rr(a,22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0; h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0; }
+    [a,b,c,d,e,f,g,h].forEach((v, i) => H[i] = (H[i] + v) | 0);
+  }
+  return H.flatMap(v => [v >>> 24, (v >>> 16) & 255, (v >>> 8) & 255, v & 255]);
+}
+const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function hexToBytes(h) { const o = []; for (let i = 0; i < h.length; i += 2) o.push(parseInt(h.slice(i, i + 2), 16)); return o; }
+function hex20ToBase58(hex20) {                    // 20-byte EVM-style hex -> TRON T... address
+  const b = [0x41, ...hexToBytes(hex20.replace(/^0x/, '').padStart(40, '0'))], full = b.concat(sha256(sha256(b)).slice(0, 4));
+  let n = 0n; for (const x of full) n = n * 256n + BigInt(x); let s = ''; while (n > 0n) { s = B58[Number(n % 58n)] + s; n /= 58n; } return s;
+}
+function base58ToHex20(s) { let n = 0n; for (const ch of s) { const i = B58.indexOf(ch); if (i < 0) throw new Error('bad address'); n = n * 58n + BigInt(i); }
+  return n.toString(16).padStart(50, '0').slice(2, 42); }
+function pressMask(i) { const r = Math.floor(i / N), c = i % N; let m = 1 << i;
+  if (r > 0) m |= 1 << (i - N); if (r < N - 1) m |= 1 << (i + N); if (c > 0) m |= 1 << (i - 1); if (c < N - 1) m |= 1 << (i + 1); return m; }
+const MASKS = Array.from({ length: CELLS }, (_, i) => pressMask(i));
+function popcount(x) { let n = 0; while (x) { x &= x - 1; n++; } return n; }
+function applyPresses(set) { let b = 0; for (let i = 0; i < CELLS; i++) if (set & (1 << i)) b ^= MASKS[i]; return b; }
+function replay(board, taps) { for (const t of taps) board ^= MASKS[t]; return board; }
+// Solve A·x = board over GF(2); return the press set with the fewest presses, or -1 if unsolvable.
+function solve(board) {
+  const rows = [];
+  for (let j = 0; j < CELLS; j++) { let r = 0; for (let i = 0; i < CELLS; i++) if (MASKS[i] & (1 << j)) r |= 1 << i; rows.push({ r, b: (board >> j) & 1 }); }
+  const pivCol = []; let rank = 0;
+  for (let col = 0; col < CELLS; col++) {
+    let p = -1; for (let k = rank; k < CELLS; k++) if (rows[k].r & (1 << col)) { p = k; break; }
+    if (p < 0) continue;
+    [rows[rank], rows[p]] = [rows[p], rows[rank]];
+    for (let k = 0; k < CELLS; k++) if (k !== rank && rows[k].r & (1 << col)) { rows[k].r ^= rows[rank].r; rows[k].b ^= rows[rank].b; }
+    pivCol.push(col); rank++;
+  }
+  for (let k = rank; k < CELLS; k++) if (rows[k].b) return -1;
+  const isPiv = new Set(pivCol), free = []; for (let c = 0; c < CELLS; c++) if (!isPiv.has(c)) free.push(c);
+  let best = -1, bestN = 99;
+  for (let combo = 0; combo < (1 << free.length); combo++) {
+    let x = 0; free.forEach((c, k) => { if (combo & (1 << k)) x |= 1 << c; });
+    for (let k = 0; k < rank; k++) { let v = rows[k].b; const others = rows[k].r & ~(1 << pivCol[k]); if (popcount(others & x) & 1) v ^= 1; if (v) x |= 1 << pivCol[k]; }
+    const n = popcount(x); if (n < bestN) { bestN = n; best = x; }
+  }
+  return best;
+}
+// Same puzzle for everyone, from the UTC date only. EXACTLY mirrors DailyLeaderboard.boardOf(day)
+// so the contract can replay your taps. Par = the fewest possible moves.
+function makePuzzle(day) {
+  const seed = [...'blockbros-daily-v1'].map(c => c.charCodeAt(0)).concat([(day >>> 24) & 255, (day >>> 16) & 255, (day >>> 8) & 255, day & 255]);
+  const h = keccak256(seed), k = 4 + (h[0] % 4);
+  let chosen = 0, got = 0, board = 0;
+  for (let i = 1; i < 32 && got < k; i++) { const c = h[i] % 25; if (!(chosen & (1 << c))) { chosen |= 1 << c; board ^= MASKS[c]; got++; } }
+  const solution = solve(board);
+  return { day, board, par: popcount(solution), solution };
+}
+// score = taps + hints (each hint counts as +1 move)
+function shareText({ num, date, moves, par, hints, streak, rank, url }) {
+  const score = moves + hints;
+  const bar = '🟩'.repeat(Math.min(score, par)) + '🟨'.repeat(Math.min(Math.max(0, score - par), 12)) + (score - par > 12 ? '…' : '');
+  return `🧩 BlockBros Daily #${num} (${date})\n✅ ${moves} moves${hints ? ` + 💡${hints}` : ''} · par ${par}\n${bar}${rank ? `\n🏆 #${rank} on today's TRON leaderboard` : ''}\n🔥 Streak ${streak}\nNo wallet, no TRX needed 👉 ${url}\n#TRON #TRONFAM`;
+}
+function decodeEntry(hex64) {                      // packed leaderboard entry from the contract
+  const e = BigInt('0x' + hex64); if (e === 0n) return null;
+  const moves = Number((e >> 88n) & 255n), hints = Number((e >> 80n) & 255n);
+  return { player: hex20ToBase58((e >> 96n).toString(16)), moves, hints, score: moves + hints, time: Number((e >> 48n) & 0xffffffffn), day: Number((e >> 16n) & 0xffffffffn) };
+}
+function rankEntries(list) { return list.filter(Boolean).sort((a, b) => a.score - b.score || a.time - b.time); }
+if (typeof module !== 'undefined') module.exports = { utcDay, dayToDate, makePuzzle, solve, applyPresses, replay, popcount, MASKS, shareText, keccak256, sha256, hex20ToBase58, base58ToHex20, decodeEntry, rankEntries, LAUNCH_DAY, MAX_MOVES };
+
+</script>
+<script>
+(() => {
+'use strict';
+// ---------- Settings ----------
+const CONTRACT = 'TNpVYqR7iT8tXSSsiKr7ETaZK5Wo5cFkXN';   // DailyLeaderboard on Nile (contract pays energy)
+const BADGE = 'TU5Fver8BpF6baXSG8kFRgZZkzuAEpybvg';      // DailyBadge on Nile (same sponsor; non-transferable records, no token)
+const API = 'https://nile.trongrid.io';
+const TRONSCAN = 'https://nile.tronscan.org/#/transaction/';
+const NILE_GENESIS = '0000000000000000d698d4192c56cb6be724a558448e2684802de4d6cd8690dc';
+const MAIN_GENESIS = '00000000000000001ebf88508a03865c71d452e25f4d51194196a1d22b6653dc';
+const FEE_LIMIT = 5_000_000;        // sun (5 TRX) safety cap. The owner's stake pays the energy, so players burn 0.
+const BADGE_ENERGY = 30_000;        // measured on Nile: 29.5K for a wallet's first claim (new storage slot); later claims use less
+const SUBMIT_ENERGY = 20_000;       // measured on Nile: ~16.6K for a 4-tap solve, plus ~150-270 per extra tap
+const ZERO_ADDR = 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb';
+const STORE = 'bbdaily.v2';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const msg = (html, cls = '') => { const m = $('msg'); m.className = cls; m.innerHTML = html; };
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const short = (a) => a ? a.slice(0, 5) + '…' + a.slice(-4) : '';
+
+// ---------- Day (UTC). ?day= override only for local file testing ----------
+const qs = new URLSearchParams(location.search);
+const TODAY = (location.protocol === 'file:' && qs.get('day')) ? Number(qs.get('day')) : utcDay(Date.now());
+const PUZ = makePuzzle(TODAY);
+const NUM = TODAY - LAUNCH_DAY + 1;
+
+// ---------- Local save (guest mode: nothing leaves this phone) ----------
+function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } }
+const S = Object.assign({ solved: {}, progress: {}, submitted: {}, badges: {} }, load());
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch {} };
+function streakNow() { let s = 0, d = S.solved[TODAY] ? TODAY : TODAY - 1; while (S.solved[d]) { s++; d--; } return s; }
+
+// ---------- TRON 101 cards ----------
+const CARDS = [
+  ['👛 What is a wallet?', 'A wallet is an app (like TronLink) that holds the <b>keys</b> to your TRON address. Your address is public, like a username. Your keys prove it\'s yours.'],
+  ['🪙 What is TRX?', 'TRX is TRON\'s coin. It pays network fees. This page uses the <b>Nile testnet</b>, where TRX is free practice money with <b>no real value</b>.'],
+  ['⚡ Energy & bandwidth', 'Every action uses <b>bandwidth</b> (the size of the message), and smart contracts also use <b>energy</b> (computing). You get 600 free bandwidth a day. Here, BlockBros pays the energy for you.'],
+  ['🔒 Never share your seed phrase', 'Your 12–24 word seed phrase <b>is</b> your wallet. Anyone who has it can take everything. No real support team, game or admin will ever ask for it.'],
+  ['🧱 The "10 TRX wall", the truth', 'A new address costs about <b>1.1 TRX</b> to activate (paid by whoever sends to it first). <b>Receiving</b> tokens is free. <b>Sending</b> USDT costs ~6.5–13 TRX of energy, which is why people say "keep 10 TRX". Builders can pay these fees for you.'],
+];
+function renderCards() {
+  const n = Math.min(CARDS.length, Object.keys(S.solved).length);
+  $('cardCount').textContent = `(${n}/${CARDS.length})`;
+  $('cards').innerHTML = CARDS.map((c, i) => i < n ? `<div class="card"><b>${c[0]}</b><br>${c[1]}</div>`
+    : `<div class="card locked">🔒 Card ${i + 1}: solve ${i + 1 - n === 1 ? 'one more day' : (i + 1 - n) + ' more days'} to unlock</div>`).join('');
+}
+
+// ---------- Board ----------
+let state = PUZ.board, seq = [], hints = 0, hintCell = -1;
+if (S.solved[TODAY]) { state = 0; seq = S.solved[TODAY].seq || []; hints = S.solved[TODAY].hints || 0; }
+else if (S.progress[TODAY]) { ({ state, seq, hints } = S.progress[TODAY]); }
+const cells = [];
+for (let i = 0; i < CELLS; i++) { const b = document.createElement('button'); b.className = 'cell'; b.setAttribute('aria-label', 'tile ' + (i + 1));
+  b.addEventListener('click', () => press(i)); $('board').appendChild(b); cells.push(b); }
+function renderBoard() {
+  const done = !!S.solved[TODAY];
+  cells.forEach((b, i) => { b.classList.toggle('on', !!(state & (1 << i))); b.classList.toggle('hint', i === hintCell); b.disabled = done; });
+  $('moves').textContent = seq.length + (hints ? `+${hints}` : ''); $('par').textContent = PUZ.par; $('pnum').textContent = '#' + NUM; $('streak').textContent = streakNow();
+  $('shareBtn2').disabled = !done; $('hintBtn').disabled = done; $('resetBtn').disabled = done;
+  $('intro').innerHTML = done ? `✅ Solved in <b>${seq.length}</b> moves${hints ? ` + ${hints} hint${hints > 1 ? 's' : ''}` : ''}. New puzzle every day at 00:00 UTC (2:00 PM Hawaii).`
+    : 'Turn <b>all the lights off</b>. Tapping a tile flips it and its neighbors (up, down, left, right). Same puzzle for everyone today.';
+}
+function press(i) {
+  if (S.solved[TODAY]) return;
+  state ^= MASKS[i]; seq.push(i); hintCell = -1;
+  S.progress[TODAY] = { state, seq, hints }; save(); renderBoard();
+  if (state === 0) onSolved();
+}
+$('resetBtn').onclick = () => { if (S.solved[TODAY]) return; state = PUZ.board; seq = []; hintCell = -1; S.progress[TODAY] = { state, seq, hints }; save(); renderBoard(); };
+$('hintBtn').onclick = () => { if (S.solved[TODAY] || !state) return; const sol = solve(state); if (sol < 0) return;
+  for (let i = 0; i < CELLS; i++) if (sol & (1 << i)) { hintCell = i; break; } hints++; S.progress[TODAY] = { state, seq, hints }; save(); renderBoard(); };
+
+function pageUrl() { return /^https?:/.test(location.protocol) ? location.origin + location.pathname : 'blockbros808.github.io'; }
+function myShare() { return shareText({ num: NUM, date: dayToDate(TODAY), moves: seq.length, par: PUZ.par, hints, streak: streakNow(), rank: myRank[TODAY], url: pageUrl() }); }
+function onSolved() {
+  const before = Math.min(CARDS.length, Object.keys(S.solved).length);
+  S.solved[TODAY] = { moves: seq.length, seq: seq.slice(), hints, par: PUZ.par, at: Date.now() };
+  delete S.progress[TODAY]; save(); renderBoard(); renderCards(); renderSubmit();
+  const newCard = Math.min(CARDS.length, Object.keys(S.solved).length) > before ? CARDS[before] : null;
+  $('solvedText').innerHTML = `${seq.length} moves${hints ? ` + ${hints} hint${hints > 1 ? 's' : ''} = score <b>${seq.length + hints}</b>` : ''} (par ${PUZ.par}).<br><span class="muted">Want to see how you rank? Submit your score to the TRON leaderboard below. It's optional and free.</span>`;
+  $('shareText').textContent = myShare();
+  $('solvedModal').classList.remove('hidden');
+  $('closeSolved').onclick = () => { $('solvedModal').classList.add('hidden');
+    if (newCard) { $('cardNew').innerHTML = `<b>${newCard[0]}</b><br>${newCard[1]}`; $('cardModal').classList.remove('hidden'); } else $('lbSec').scrollIntoView({ behavior: 'smooth' }); };
+}
+$('closeCard').onclick = () => { $('cardModal').classList.add('hidden'); $('lbSec').scrollIntoView({ behavior: 'smooth' }); };
+async function copy(text, btn) {
+  let ok = false; try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+  if (!ok) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { ok = document.execCommand('copy'); } catch {} t.remove(); }
+  if (btn) { const o = btn.textContent; btn.textContent = ok ? '✅ Copied' : '⚠️ Copy failed'; setTimeout(() => btn.textContent = o, 1500); }
+}
+$('shareBtn').onclick = (e) => copy(myShare(), e.currentTarget);
+$('shareBtn2').onclick = () => { $('shareText').textContent = myShare(); $('solvedText').innerHTML = 'Come back tomorrow for a new puzzle!'; $('solvedModal').classList.remove('hidden'); $('closeSolved').onclick = () => $('solvedModal').classList.add('hidden'); };
+$('copyLinkBtn').onclick = (e) => copy(pageUrl().startsWith('http') ? pageUrl() : 'https://' + pageUrl(), e.currentTarget);
+function tick() { const ms = (TODAY + 1) * 86400000 - Date.now(); $('nextIn').textContent = ms > 0 && ms < 86400000 ? `Next puzzle in ${Math.floor(ms / 3600000)}h ${Math.floor(ms / 60000) % 60}m (00:00 UTC · 2:00 PM Hawaii)` : ''; }
+
+// ---------- Public chain reads (free, no wallet, no key) ----------
+async function post(path, body) { const r = await fetch(API + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); return r.json(); }
+async function readTop(day) {
+  const j = await post('/wallet/triggerconstantcontract', { owner_address: ZERO_ADDR, contract_address: CONTRACT, function_selector: 'getTop(uint32)', parameter: day.toString(16).padStart(64, '0'), visible: true });
+  if (!j.constant_result || !j.result || !j.result.result) throw new Error('read failed');
+  return rankEntries(j.constant_result[0].match(/.{64}/g).map(decodeEntry));
+}
+async function readAllScores(day) {   // every ScoreSubmitted event that day -> each player's best (for "your rank")
+  const since = day * 86400000 - 3600000;
+  const j = await (await fetch(`${API}/v1/contracts/${CONTRACT}/events?event_name=ScoreSubmitted&only_confirmed=false&order_by=block_timestamp,asc&limit=200&min_block_timestamp=${since}`)).json();
+  const best = {};
+  for (const x of (j.data || [])) { if (+x.result.day !== day) continue;
+    const e = { player: hex20ToBase58(x.result.player), score: +x.result.score, moves: +x.result.moves, hints: +x.result.hints, time: Math.floor(x.block_timestamp / 1000) };
+    const b = best[e.player]; if (!b || e.score < b.score) best[e.player] = e; }
+  return rankEntries(Object.values(best));
+}
+async function readSponsor() {
+  try { const c = await post('/wallet/getcontract', { value: CONTRACT, visible: true });
+    const r = await post('/wallet/getaccountresource', { address: c.origin_address, visible: true });
+    const left = Math.max(0, (r.EnergyLimit || 0) - (r.EnergyUsed || 0)); window.__sponsorLeft = left;
+    $('sponsor').textContent = `${left.toLocaleString()} energy left right now, about ${Math.floor(left / SUBMIT_ENERGY)} submits; it refills over 24h`; return left;
+  } catch { $('sponsor').textContent = 'status unavailable'; return null; }
+}
+// ---------- Daily badge reads (free, no wallet) ----------
+async function readConst(contract, sel, paramHex) {
+  const j = await post('/wallet/triggerconstantcontract', { owner_address: ZERO_ADDR, contract_address: contract, function_selector: sel, parameter: paramHex || '', visible: true });
+  if (!j.constant_result || !j.result || !j.result.result) throw new Error('read failed'); return j.constant_result[0];
+}
+function addrParam(a) { const h = base58ToHex20(a); if (!h) throw new Error('bad address'); return h.padStart(64, '0'); }
+async function readBadge(addr) {   // players(addr) -> lastDay, count, streak, best, recent ; plus hasClaimed(addr, TODAY)
+  const w = (await readConst(BADGE, 'players(address)', addrParam(addr))).match(/.{64}/g).map(x => parseInt(x.slice(-16), 16));
+  const has = parseInt(await readConst(BADGE, 'hasClaimed(address,uint32)', addrParam(addr) + TODAY.toString(16).padStart(64, '0')), 16) === 1;
+  return { lastDay: w[0], count: w[1], streak: w[2], best: w[3], claimedToday: has };
+}
+let badgeMine = null, badgeTotal = null;
+async function renderBadge() {
+  try { badgeTotal = parseInt(await readConst(BADGE, 'totalClaims()'), 16); } catch {}
+  const who = account || (S.badges[TODAY] && S.badges[TODAY].addr) || Object.values(S.badges).map(b => b.addr).pop() || null;
+  if (who) { try { badgeMine = await readBadge(who); if (badgeMine.claimedToday && !S.badges[TODAY]) { S.badges[TODAY] = { addr: who, txid: '' }; save(); } } catch { badgeMine = null; } }
+  const parts = [];
+  if (badgeMine) parts.push(`🎖️ ${esc(short(who))} has <b>${badgeMine.count}</b> badge${badgeMine.count === 1 ? '' : 's'} · streak <b>${badgeMine.streak}</b> · best ${badgeMine.best}${badgeMine.claimedToday ? ' · ✅ today\'s badge claimed' : ''}`);
+  if (badgeTotal !== null) parts.push(`<span class="muted">${badgeTotal.toLocaleString()} badge${badgeTotal === 1 ? '' : 's'} claimed by all players so far (read live from Nile).</span>`);
+  $('badgeInfo').innerHTML = parts.join('<br>'); renderSubmit();
+}
+let lbDay = TODAY; const myRank = {};
+function me() { return account || (S.submitted[lbDay] && S.submitted[lbDay].addr) || null; }
+async function renderLeaderboard() {
+  $('tabToday').classList.toggle('on', lbDay === TODAY); $('tabYest').classList.toggle('on', lbDay !== TODAY);
+  try {
+    const top = await readTop(lbDay), mine = me();
+    $('lbTable').innerHTML = top.length ? `<table><tr><th>#</th><th>Player</th><th>Time</th><th class="s">Score</th></tr>${top.map((e, i) =>
+      `<tr class="${e.player === mine ? 'me' : ''}"><td class="r">${i + 1}</td><td><span class="addr">${esc(short(e.player))}</span>${e.player === mine ? ' (you)' : ''}</td><td class="muted">${new Date(e.time * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</td><td class="s">${e.score}<span class="muted" style="font-weight:400">${e.hints ? ` (${e.moves}+💡${e.hints})` : ''}</span></td></tr>`).join('')}</table>`
+      : `<div class="muted">No scores yet for puzzle #${lbDay - LAUNCH_DAY + 1}. Be the first! 🥇</div>`;
+    $('you').innerHTML = '';
+    if (mine) { try { const all = await readAllScores(lbDay); const i = all.findIndex(e => e.player === mine);
+      if (i >= 0) { myRank[lbDay] = i + 1; $('you').innerHTML = `You: <b>#${i + 1}</b> of ${all.length} players, score ${all[i].score}`; }
+      else $('you').innerHTML = `<span class="muted">No score from ${esc(short(mine))} for this day yet.</span>`; } catch {} }
+  } catch (e) { $('lbTable').innerHTML = '<div class="muted">Couldn\'t reach the Nile testnet right now. Try again soon.</div>'; }
+}
+$('tabToday').onclick = () => { lbDay = TODAY; renderLeaderboard(); };
+$('tabYest').onclick = () => { lbDay = TODAY - 1; renderLeaderboard(); };
+
+// ---------- TronLink + submit ----------
+let tw = null, account = null, onNile = false, activated = false, busy = false;
+const hasTronLink = () => !!(window.tronLink || window.tron || window.tronWeb);
+function getTronWeb() { return (window.tron && window.tron.tronWeb) || (window.tronLink && window.tronLink.tronWeb) || window.tronWeb || null; }
+async function checkNetwork(t) {
+  try { const b = await t.trx.getBlockByNumber(0); const id = b && (b.blockID || b.blockId); if (id === NILE_GENESIS) return 'nile'; if (id === MAIN_GENESIS) return 'mainnet'; } catch {}
+  const host = (t.fullNode && t.fullNode.host) || ''; if (/nile/i.test(host)) return 'nile'; if (/api\.trongrid\.io|mainnet/i.test(host)) return 'mainnet'; return 'unknown'; }
+function errText(e) { return typeof e === 'string' ? e : (e && (e.message || e.error)) || JSON.stringify(e); }
+function isReject(e) { return (e && e.code === 4001) || /declin|reject|cancel|denied/i.test(errText(e)); }
+function hexToText(h) { try { return decodeURIComponent(String(h).replace(/(..)/g, '%$1')); } catch { return ''; } }
+function submittable() { return [TODAY, TODAY - 1].filter(d => S.solved[d] && !S.submitted[d] && (S.solved[d].seq || []).length); }
+function renderSubmit() {
+  const days = submittable(), solvedToday = !!S.solved[TODAY];
+  const badgeDone = !!S.badges[TODAY] || !!(badgeMine && badgeMine.claimedToday);
+  $('submitState').textContent = !solvedToday && !days.length ? 'Solve today\'s puzzle first, then you can submit your score and claim today\'s free badge.'
+    : [S.submitted[TODAY] ? '✅ Today\'s score is on the leaderboard.' : '', solvedToday && badgeDone ? '✅ Today\'s badge is claimed.' : ''].filter(Boolean).join(' ');
+  $('noWallet').classList.toggle('hidden', hasTronLink() || !(days.length || (solvedToday && !badgeDone)));
+  $('walletBox').classList.toggle('hidden', !hasTronLink());
+  $('submitBtns').innerHTML = days.map(d => { const s = S.solved[d], n = s.seq.length;
+    return n > MAX_MOVES ? `<div class="muted">Puzzle #${d - LAUNCH_DAY + 1}: ${n} moves is over the ${MAX_MOVES}-move limit, so it can't be submitted.</div>`
+      : `<button class="gold submitDay" data-day="${d}" ${account && onNile && activated && !busy ? '' : 'disabled'}>🏆 Submit score to leaderboard #${d - LAUNCH_DAY + 1}${d === TODAY ? '' : ' (yesterday)'}: ${n + (s.hints || 0)}</button>`; }).join('')
+    + (solvedToday && !badgeDone ? `<button class="alt claimBadge" ${account && onNile && activated && !busy ? '' : 'disabled'}>🎖️ Claim today's free badge #${NUM}</button>` : '');
+  document.querySelectorAll('.claimBadge').forEach(b => b.onclick = claimBadge);
+  document.querySelectorAll('.submitDay').forEach(b => b.onclick = () => submitScore(Number(b.dataset.day)));
+}
+async function connect() {
+  msg('Looking for TronLink…');
+  try {
+    if (window.tron && window.tron.request) await window.tron.request({ method: 'eth_requestAccounts' });
+    else if (window.tronLink && window.tronLink.request) { const r = await window.tronLink.request({ method: 'tron_requestAccounts' }); if (r && r.code === 4001) throw { code: 4001 }; }
+  } catch (e) { msg(isReject(e) ? 'Connection was rejected in TronLink.' : 'Could not connect: ' + esc(errText(e)), 'err'); return; }
+  tw = getTronWeb(); account = tw && tw.defaultAddress && tw.defaultAddress.base58;
+  if (!account) { msg('TronLink is locked or has no account. Unlock it and try again.', 'err'); return; }
+  $('connectBtn').textContent = '🔄 Refresh wallet'; $('acct').classList.remove('hidden'); $('addr').textContent = account;
+  const net = await checkNetwork(tw); onNile = net === 'nile';
+  try { const a = await post('/wallet/getaccount', { address: account, visible: true }); activated = !!(a && a.address); } catch { activated = false; }
+  if (net === 'mainnet') msg('⚠️ TronLink is on <b>MAINNET</b>. This game is Nile testnet only. Switch the node to <b>Nile Testnet</b>, then tap Refresh.', 'err');
+  else if (!onNile) msg('⚠️ Could not confirm TronLink is on Nile. Switch the node to <b>Nile Testnet</b> and tap Refresh.', 'err');
+  else if (!activated) msg('Your wallet isn\'t <b>activated</b> on Nile yet. This is the 1.1 TRX "wall". Get free test TRX at <a href="https://nileex.io/join/getJoinPage" target="_blank" rel="noopener">nileex.io</a> (that activates it), then tap Refresh. Our next build will activate wallets for you.', 'err');
+  else msg('Connected on Nile testnet ✅', 'ok');
+  readSponsor(); renderSubmit(); renderLeaderboard(); renderBadge();
+}
+async function submitScore(day) {
+  if (busy) return; busy = true; renderSubmit();
+  try {
+    if (await checkNetwork(tw) !== 'nile') { onNile = false; throw new Error('Not on Nile testnet, so the submit was blocked.'); }
+    const s = S.solved[day], movesHex = '0x' + s.seq.map(t => t.toString(16).padStart(2, '0')).join('');
+    if (replay(makePuzzle(day).board, s.seq) !== 0) throw new Error('Saved moves do not solve the puzzle');
+    const left = await readSponsor();
+    msg(left !== null && left < SUBMIT_ENERGY ? '⚠️ The sponsor\'s energy is low right now, so this may fail. It refills through the day. Approve in TronLink to try anyway.' : 'Building your submit… approve it in TronLink.');
+    const { transaction, result } = await tw.transactionBuilder.triggerSmartContract(CONTRACT, 'submit(uint32,bytes,uint8)', { feeLimit: FEE_LIMIT, callValue: 0 },
+      [{ type: 'uint32', value: day }, { type: 'bytes', value: movesHex }, { type: 'uint8', value: Math.min(255, s.hints || 0) }], account);
+    if (!result || !result.result || !transaction) throw new Error('Could not build the transaction');
+    const signed = await tw.trx.sign(transaction);
+    const sent = await tw.trx.sendRawTransaction(signed);
+    if (!sent || !sent.result) throw new Error((sent && (hexToText(sent.message || '') || sent.code)) || 'broadcast failed');
+    const txid = sent.txid || transaction.txID;
+    const link = `<a href="${TRONSCAN + esc(txid)}" target="_blank" rel="noopener">${esc(txid.slice(0, 18))}…</a>`;
+    msg('Sent! Waiting for confirmation… ' + link);
+    let info = null;
+    for (let i = 0; i < 30 && !(info && info.id); i++) { await sleep(i ? 3000 : 1000); info = await post('/wallet/gettransactioninfobyid', { value: txid }); }
+    const rc = (info && info.receipt) || {}, res = rc.result;
+    if (info && info.id && (!res || res === 'SUCCESS')) {
+      S.submitted[day] = { txid, addr: account, score: s.seq.length + (s.hints || 0) }; save(); busy = false; renderSubmit();
+      msg(`🏆 Score submitted to TRON!<br>You paid <b>${((info.fee || 0) / 1e6).toFixed(4)} TRX</b> in fees. BlockBros paid <b>${(rc.origin_energy_usage || 0).toLocaleString()}</b> energy for you.<br>${link}`, 'ok');
+      lbDay = day; await sleep(1500); renderLeaderboard();
+    } else if (info && info.id) {
+      const why = info.contractResult && info.contractResult[0] ? hexToText(info.contractResult[0].slice(136)).replace(/\0/g, '') : '';
+      msg(res === 'OUT_OF_ENERGY' ? `The sponsor ran out of energy for today, so the submit didn't go through. Please try again in a few hours. ${link}` : `Submit failed (${esc(res)}${why ? ': ' + esc(why) : ''}). ${link}`, 'err');
+    } else msg('Not confirmed yet. Check Tronscan: ' + link);
+  } catch (e) {
+    const t = errText(e);
+    if (isReject(e)) msg('You rejected it in TronLink. Nothing was sent.', 'err');
+    else if (/not today/i.test(t)) msg('That puzzle is too old. You can only submit today\'s or yesterday\'s.', 'err');
+    else if (/do not solve/i.test(t)) msg('Your saved moves don\'t solve this puzzle, so nothing was sent.', 'err');
+    else if (/not solved/i.test(t)) msg('The contract replayed your taps and the lights weren\'t all off, so the score was rejected.', 'err');
+    else if (/account.*not.*exist|does not exist/i.test(t)) msg('Your wallet needs to be activated on Nile first (the 1.1 TRX wall).', 'err');
+    else if (/balance|energy|bandwidth/i.test(t)) msg('Not enough resources right now. The sponsor energy refills over the day, so try again later.', 'err');
+    else msg('Submit error: ' + esc(t), 'err');
+  } finally { busy = false; renderSubmit(); }
+}
+async function claimBadge() {
+  if (busy || !S.solved[TODAY]) return; busy = true; renderSubmit();
+  try {
+    if (await checkNetwork(tw) !== 'nile') { onNile = false; throw new Error('Not on Nile testnet, so the claim was blocked.'); }
+    try { const b = await readBadge(account); if (b.claimedToday) { S.badges[TODAY] = { addr: account, txid: '' }; save(); badgeMine = b; msg('You already have today\'s badge ✅', 'ok'); return; } } catch {}
+    const left = await readSponsor();
+    msg(left !== null && left < BADGE_ENERGY ? '⚠️ The sponsor\'s energy is low right now, so the claim may cost you test TRX or fail. It refills through the day. Approve in TronLink to try anyway.' : 'Building your free badge claim… approve it in TronLink.');
+    const { transaction, result } = await tw.transactionBuilder.triggerSmartContract(BADGE, 'claim(uint32)', { feeLimit: FEE_LIMIT, callValue: 0 }, [{ type: 'uint32', value: TODAY }], account);
+    if (!result || !result.result || !transaction) throw new Error('Could not build the transaction');
+    const signed = await tw.trx.sign(transaction);
+    const sent = await tw.trx.sendRawTransaction(signed);
+    if (!sent || !sent.result) throw new Error((sent && (hexToText(sent.message || '') || sent.code)) || 'broadcast failed');
+    const txid = sent.txid || transaction.txID;
+    const link = `<a href="${TRONSCAN + esc(txid)}" target="_blank" rel="noopener">${esc(txid.slice(0, 18))}…</a>`;
+    msg('Sent! Waiting for confirmation… ' + link);
+    let info = null;
+    for (let i = 0; i < 30 && !(info && info.id); i++) { await sleep(i ? 3000 : 1000); info = await post('/wallet/gettransactioninfobyid', { value: txid }); }
+    const rc = (info && info.receipt) || {}, res = rc.result;
+    if (info && info.id && (!res || res === 'SUCCESS')) {
+      S.badges[TODAY] = { txid, addr: account }; save(); busy = false; renderSubmit();
+      msg(`🎖️ Badge #${NUM} claimed!<br>You paid <b>${((info.fee || 0) / 1e6).toFixed(4)} TRX</b> in fees. BlockBros paid <b>${(rc.origin_energy_usage || 0).toLocaleString()}</b> energy for you.<br>${link}`, 'ok');
+      await sleep(1500); renderBadge();
+    } else if (info && info.id) {
+      const why = info.contractResult && info.contractResult[0] ? hexToText(info.contractResult[0].slice(136)).replace(/\0/g, '') : '';
+      msg(res === 'OUT_OF_ENERGY' ? `The sponsor ran out of energy for today, so the claim didn't go through. Please try again in a few hours. ${link}` : `Claim failed (${esc(res)}${why ? ': ' + esc(why) : ''}). ${link}`, 'err');
+    } else msg('Not confirmed yet. Check Tronscan: ' + link);
+  } catch (e) {
+    const t = errText(e);
+    if (isReject(e)) msg('You rejected it in TronLink. Nothing was sent.', 'err');
+    else if (/already claimed/i.test(t)) { S.badges[TODAY] = { addr: account, txid: '' }; save(); msg('You already have today\'s badge ✅', 'ok'); }
+    else if (/account.*not.*exist|does not exist/i.test(t)) msg('Your wallet needs to be activated on Nile first (the 1.1 TRX wall).', 'err');
+    else if (/balance|energy|bandwidth/i.test(t)) msg('Not enough resources right now. The sponsor energy refills over the day, so try again later.', 'err');
+    else msg('Badge error: ' + esc(t), 'err');
+  } finally { busy = false; renderSubmit(); }
+}
+$('connectBtn').onclick = connect;
+window.addEventListener('message', (e) => { const a = e.data && e.data.message && e.data.message.action;
+  if (account && (a === 'setAccount' || a === 'setNode' || a === 'accountsChanged')) connect(); });
+
+window.__pz = { PUZ, TODAY, get state() { return state; }, get seq() { return seq; }, press, solve, S };
+save(); renderBoard(); renderCards(); tick(); setInterval(tick, 30000); readSponsor(); renderLeaderboard(); renderBadge(); setInterval(renderLeaderboard, 60000);
+(async () => { for (let i = 0; i < 20 && !hasTronLink(); i++) await sleep(150); renderSubmit(); })();
+})();
+</script>
+</body>
+</html>
