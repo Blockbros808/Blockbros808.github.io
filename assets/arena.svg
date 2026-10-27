@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#140818"/>
+      <stop offset=".55" stop-color="#1a0c22"/>
+      <stop offset="1" stop-color="#07060c"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="46%" r="42%">
+      <stop offset="0" stop-color="#ffe7b0"/>
+      <stop offset=".22" stop-color="#ff8a3c"/>
+      <stop offset=".5" stop-color="#ff2f86" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#ff2f86" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cyanMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14343a"/>
+      <stop offset="1" stop-color="#071418"/>
+    </linearGradient>
+    <linearGradient id="magMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a1430"/>
+      <stop offset="1" stop-color="#160812"/>
+    </linearGradient>
+    <clipPath id="floorClip">
+      <rect x="0" y="248" width="800" height="272"/>
+    </clipPath>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="520" fill="url(#sky)"/>
+  <circle cx="400" cy="236" r="168" fill="url(#sun)"/>
+  <g clip-path="url(#floorClip)" stroke="#7ef6ff" stroke-opacity=".45">
+    <line x1="400" y1="250" x2="-20" y2="520"/>
+    <line x1="400" y1="250" x2="80" y2="520"/>
+    <line x1="400" y1="250" x2="180" y2="520"/>
+    <line x1="400" y1="250" x2="280" y2="520"/>
+    <line x1="400" y1="250" x2="400" y2="520"/>
+    <line x1="400" y1="250" x2="520" y2="520"/>
+    <line x1="400" y1="250" x2="620" y2="520"/>
+    <line x1="400" y1="250" x2="720" y2="520"/>
+    <line x1="400" y1="250" x2="820" y2="520"/>
+    <path d="M330 278h140"/>
+    <path d="M286 312h228"/>
+    <path d="M220 358h360"/>
+    <path d="M130 418h540"/>
+    <path d="M20 492h760"/>
+  </g>
+  <ellipse cx="400" cy="392" rx="250" ry="36" stroke="#ffd27a" stroke-opacity=".55"/>
+  <ellipse cx="400" cy="392" rx="168" ry="22" stroke="#5dffe8" stroke-opacity=".4"/>
+
+  <g filter="url(#glow)" stroke-linejoin="round">
+    <g transform="translate(78 0)">
+    <ellipse cx="230" cy="430" rx="78" ry="12" fill="#000" opacity=".45" stroke="none"/>
+    <g fill="url(#cyanMetal)" stroke="#8dfff4" stroke-width="3">
+      <rect x="118" y="286" width="26" height="78" rx="8" transform="rotate(-12 131 286)"/>
+      <rect x="108" y="354" width="40" height="14" rx="4"/>
+      <rect x="176" y="292" width="28" height="84" rx="8" transform="rotate(8 190 292)"/>
+      <rect x="196" y="366" width="44" height="14" rx="4"/>
+      <rect x="132" y="196" width="96" height="108" rx="14"/>
+      <rect x="154" y="222" width="52" height="40" rx="8" fill="#0c2e34"/>
+      <circle cx="180" cy="242" r="7" fill="#5dffe8" stroke="none"/>
+      <rect x="146" y="128" width="74" height="60" rx="12"/>
+      <rect x="160" y="152" width="46" height="12" rx="3" fill="#5dffe8" stroke="none"/>
+      <rect x="86" y="214" width="24" height="70" rx="8" transform="rotate(16 98 214)"/>
+      <rect x="214" y="228" width="78" height="22" rx="8"/>
+      <rect x="282" y="222" width="30" height="30" rx="7" fill="#5dffe8"/>
+    </g>
+    <line x1="183" y1="128" x2="183" y2="104" stroke="#8dfff4" stroke-width="3"/>
+    <circle cx="183" cy="96" r="7" fill="#5dffe8"/>
+    </g>
+
+    <g transform="translate(-78 0)">
+    <ellipse cx="578" cy="430" rx="78" ry="12" fill="#000" opacity=".45" stroke="none"/>
+    <g fill="url(#magMetal)" stroke="#ff8adf" stroke-width="3">
+      <rect x="612" y="286" width="26" height="78" rx="8" transform="rotate(12 625 286)"/>
+      <rect x="652" y="354" width="40" height="14" rx="4"/>
+      <rect x="548" y="292" width="28" height="84" rx="8" transform="rotate(-8 562 292)"/>
+      <rect x="520" y="366" width="44" height="14" rx="4"/>
+      <rect x="572" y="196" width="96" height="108" rx="14"/>
+      <rect x="594" y="222" width="52" height="40" rx="8" fill="#341226"/>
+      <circle cx="620" cy="242" r="7" fill="#ff3dbe" stroke="none"/>
+      <rect x="580" y="128" width="74" height="60" rx="12"/>
+      <rect x="594" y="152" width="46" height="12" rx="3" fill="#ff3dbe" stroke="none"/>
+      <rect x="690" y="214" width="24" height="70" rx="8" transform="rotate(-16 702 214)"/>
+      <rect x="508" y="228" width="78" height="22" rx="8"/>
+      <rect x="486" y="222" width="30" height="30" rx="7" fill="#ff3dbe"/>
+    </g>
+    <line x1="617" y1="128" x2="617" y2="104" stroke="#ff8adf" stroke-width="3"/>
+    <circle cx="617" cy="96" r="7" fill="#ff3dbe"/>
+    </g>
+  </g>
+
+  <g transform="translate(400 248)">
+    <polygon points="0,-26 7,-8 26,-8 11,3 16,24 0,11 -16,24 -11,3 -26,-8 -7,-8" fill="#fff4cc" stroke="#ffd27a" stroke-width="2"/>
+    <circle r="6" fill="#fff"/>
+  </g>
+</svg>

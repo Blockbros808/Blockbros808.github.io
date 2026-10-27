@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <defs>
+    <radialGradient id="dpGlow" cx="50%" cy="48%" r="48%">
+      <stop offset="0" stop-color="#ffc857" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#ffc857" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="on" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff1c2"/>
+      <stop offset=".45" stop-color="#ffc857"/>
+      <stop offset="1" stop-color="#e09600"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="#100c08"/>
+  <circle cx="400" cy="250" r="210" fill="url(#dpGlow)"/>
+  <rect x="214" y="64" width="372" height="372" rx="28" fill="#1a140c" stroke="#ffc857" stroke-opacity=".45"/>
+  <g>
+    <!-- 5x5 lights. on cells use gold, off cells stay dark. -->
+    <g id="row">
+      <rect x="242" y="92" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="310" y="92" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="378" y="92" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="446" y="92" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="514" y="92" width="56" height="56" rx="12" fill="#2a2418"/>
+
+      <rect x="242" y="160" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="310" y="160" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="378" y="160" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="446" y="160" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="514" y="160" width="56" height="56" rx="12" fill="url(#on)"/>
+
+      <rect x="242" y="228" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="310" y="228" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="378" y="228" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="446" y="228" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="514" y="228" width="56" height="56" rx="12" fill="#2a2418"/>
+
+      <rect x="242" y="296" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="310" y="296" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="378" y="296" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="446" y="296" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="514" y="296" width="56" height="56" rx="12" fill="url(#on)"/>
+
+      <rect x="242" y="364" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="310" y="364" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="378" y="364" width="56" height="56" rx="12" fill="#2a2418"/>
+      <rect x="446" y="364" width="56" height="56" rx="12" fill="url(#on)"/>
+      <rect x="514" y="364" width="56" height="56" rx="12" fill="#2a2418"/>
+    </g>
+  </g>
+</svg>
