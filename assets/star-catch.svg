@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <defs>
+    <linearGradient id="scSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#07141c"/>
+      <stop offset="1" stop-color="#07060f"/>
+    </linearGradient>
+    <radialGradient id="scGlow" cx="50%" cy="46%" r="40%">
+      <stop offset="0" stop-color="#5dffe8" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#5dffe8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#scSky)"/>
+  <circle cx="400" cy="230" r="180" fill="url(#scGlow)"/>
+  <g stroke="#5dffe8" stroke-opacity=".35">
+    <path d="M0 360 H800"/>
+    <path d="M80 400 H720"/>
+    <path d="M180 440 H620"/>
+    <path d="M400 250 L40 500"/>
+    <path d="M400 250 L200 500"/>
+    <path d="M400 250 L360 500"/>
+    <path d="M400 250 L520 500"/>
+    <path d="M400 250 L700 500"/>
+    <path d="M40 80 H240"/>
+    <path d="M40 120 H180"/>
+    <path d="M40 160 H120"/>
+    <path d="M560 70 H760"/>
+    <path d="M620 110 H760"/>
+    <path d="M680 150 H760"/>
+  </g>
+  <circle cx="400" cy="214" r="92" stroke="#8dfff4" stroke-width="3" stroke-dasharray="10 8"/>
+  <circle cx="400" cy="214" r="64" stroke="#ffd27a" stroke-opacity=".8" stroke-width="2"/>
+  <path d="M292 214 H340 M460 214 H508 M400 106 V154 M400 274 V322" stroke="#8dfff4" stroke-width="3"/>
+  <polygon points="400,132 418,190 480,190 430,226 448,286 400,250 352,286 370,226 320,190 382,190" fill="#ffd27a" stroke="#fff6d4" stroke-width="2"/>
+  <circle cx="168" cy="120" r="3" fill="#fff"/>
+  <circle cx="640" cy="150" r="2.5" fill="#5dffe8"/>
+  <circle cx="210" cy="210" r="2" fill="#ff8adf"/>
+  <circle cx="600" cy="250" r="2" fill="#fff"/>
+  <path d="M120 250 C 180 210, 230 250, 250 214" stroke="#5dffe8" stroke-opacity=".7" stroke-width="3"/>
+  <path d="M680 180 C 620 160, 560 200, 530 214" stroke="#ff3dbe" stroke-opacity=".65" stroke-width="3"/>
+</svg>
