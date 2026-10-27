@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <defs>
+    <radialGradient id="msFlash" cx="50%" cy="42%" r="36%">
+      <stop offset="0" stop-color="#fff6ea" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#fff6ea" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="#100c14"/>
+  <circle cx="400" cy="220" r="180" fill="url(#msFlash)"/>
+  <rect x="210" y="48" width="380" height="404" rx="18" fill="#18141f" stroke="#ff3dbe" stroke-opacity=".7" stroke-width="4"/>
+  <g stroke="#7ef6ff" stroke-opacity=".45">
+    <path d="M248 110 H552"/>
+    <path d="M248 170 H552"/>
+    <path d="M248 230 H552"/>
+    <path d="M248 290 H552"/>
+    <path d="M248 350 H552"/>
+  </g>
+  <circle cx="400" cy="196" r="54" fill="#241c2e" stroke="#ffe7ad" stroke-width="3"/>
+  <path d="M348 292 C 360 250, 440 250, 452 292 V340 H348 Z" fill="#241c2e" stroke="#ffe7ad" stroke-width="3"/>
+  <rect x="300" y="390" width="200" height="28" rx="6" fill="#ff3dbe" fill-opacity=".85"/>
+  <circle cx="400" cy="86" r="10" fill="#fff6ea"/>
+</svg>
