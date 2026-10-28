@@ -810,6 +810,26 @@ h2 {
   letter-spacing: -0.04em;
 }
 
+.meme-figure {
+  margin: 1.2rem 0 0;
+}
+
+.meme-figure img {
+  width: 100%;
+  max-width: 920px;
+  height: auto;
+  margin-inline: auto;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: 0 0 40px rgba(255, 61, 190, 0.16), 0 0 28px rgba(126, 246, 255, 0.12);
+}
+
+.meme-caption {
+  margin: 0.9rem 0 0;
+  max-width: 40rem;
+  color: var(--muted);
+}
+
 .quick-socials {
   display: flex;
   flex-wrap: wrap;
