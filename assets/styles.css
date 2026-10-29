@@ -220,6 +220,12 @@ a { color: inherit; }
   background: var(--ink);
   color: #140814 !important;
   justify-content: center;
+  white-space: nowrap;
+}
+
+.site-nav a.nav-cta:hover {
+  background: #fff;
+  color: #140814 !important;
 }
 
 body.nav-open { overflow: hidden; }
@@ -800,6 +806,7 @@ h2 {
     border: 0;
   }
   .site-nav a { padding-inline: 0.7rem; }
+  .site-nav .nav-cta { margin-left: 0.35rem; }
   body.nav-open { overflow: auto; }
 }
 
