@@ -37,7 +37,7 @@
     var email = String(data.get("email") || "").trim();
     var message = String(data.get("message") || "").trim();
     var body = "Name: " + name + "\nEmail: " + email + "\n\n" + message;
-    var href = "mailto:Daotron78@gmail.com?subject=" + encodeURIComponent("BLOCKBROS — " + name) + "&body=" + encodeURIComponent(body);
+    var href = "mailto:blockbros1808@gmail.com?subject=" + encodeURIComponent("BLOCKBROS — " + name) + "&body=" + encodeURIComponent(body);
     window.location.href = href;
   });
 })();
