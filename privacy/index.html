@@ -89,7 +89,7 @@
 <li>
 <p><strong>Hub visit counts (anonymous).</strong> On <strong>play.blockbros808.com</strong> we show a public “visitors today” total. We store <strong>counts only</strong> (page views, unique visits per Hawaiʻi day, and path totals) — <strong>no</strong> names, IPs, user-agents, fingerprints, or advertising profiles. Your browser may keep a <strong>same-day local-storage flag</strong> so we don’t count you twice that day. Rate limits may hold an IP <strong>in memory briefly</strong> and never write it to disk.</p>
 <p><strong>Hub online count (anonymous).</strong> On the play hub we may also show how many people are <strong>online now</strong> as a <strong>number only</strong>. That total comes from short-lived BlockChat presence heartbeats (about a minute). The public count does <strong>not</strong> show names, IPs, rooms, or who is who.</p>
-<p><strong>Hub game likes (optional, anonymous).</strong> On the play hub you may tap ♥ to like a game. Likes are <strong>optional</strong>. We store <strong>counts only</strong> (per game) — <strong>no</strong> names, accounts required, IPs on disk, or advertising profiles. Guests can like. Rate limits may hold an IP <strong>in memory briefly</strong>. Soft 13+ still applies. Your browser may keep a <strong>local flag</strong> so the heart stays filled for you.</p>
+<p><strong>Hub game likes (optional, anonymous).</strong> On the play hub you may tap ♥ to like a game. Likes are <strong>optional</strong>. Public totals are <strong>counts only</strong> (per game) — <strong>no</strong> names, accounts required, raw device IDs, IPs on disk, or advertising profiles. Guests can like. Soft 13+ still applies. To keep likes fair (<strong>about one lasting like per game per device</strong>, with <strong>same-day undo</strong>), we may keep a <strong>salted one-way lock token</strong> derived from the game and your device — not a readable device ID and not your IP. Rate limits may also hold an IP <strong>in memory briefly</strong>. Your browser may keep a <strong>local flag</strong> so the heart stays filled for you.</p>
 </li>
 <li>
 <p><strong>Cookies and similar storage.</strong> Our games and site may use browser storage (cookies, local storage) to save settings, progress, and (on the hub) a same-day visitor flag for the public door counter and a local like flag for ♥ buttons. We do <strong>not</strong> use advertising cookies. Hosting platforms (GitHub Pages, gd.games, itch.io) may still log technical data under their own policies.</p>
@@ -176,7 +176,8 @@
 <li><strong>Emails to us:</strong> as long as needed to help you, then deleted within a reasonable time</li>
 <li><strong>Hub safety / ops signals (staff only):</strong> about <strong>30 days</strong>, then deleted or rolled into anonymous totals</li>
 <li><strong>Hub visit count totals (anonymous):</strong> day and path totals kept for a limited period (up to about a year of daily totals), then dropped</li>
-<li><strong>Hub game like totals (anonymous):</strong> per-game counts kept while the game is listed (or rolled into anonymous totals); we do not keep a personal like history on our servers</li>
+<li><strong>Hub game like totals (anonymous):</strong> per-game counts kept while the game is listed (or rolled into anonymous totals)</li>
+<li><strong>Hub like lock tokens (anonymous):</strong> salted one-way tokens kept so a device cannot re-like the same game after the same-day undo window; not tied to a name or account; dropped if we remove the lock system or delist the game</li>
 <li><strong>Blockchain data:</strong> permanent on the blockchain and outside our control</li>
 </ul>
 <hr />
