@@ -621,8 +621,7 @@ h2 {
 .where { font-size: 0.82rem; color: var(--dim); font-weight: 600; }
 
 .place-grid a,
-.social-grid a,
-.founder-links a {
+.social-grid a {
   text-decoration: none;
 }
 
@@ -640,12 +639,10 @@ h2 {
 }
 
 .place strong,
-.social strong,
-.founder-links strong { display: block; font-size: 1rem; }
+.social strong { display: block; font-size: 1rem; }
 
 .place small,
-.social small,
-.founder-links small {
+.social small {
   display: block;
   color: var(--dim);
   font-size: 0.86rem;
@@ -664,55 +661,6 @@ h2 {
 }
 
 .icon svg { width: 22px; height: 22px; display: block; }
-
-.founder {
-  margin-top: 1.4rem;
-  display: grid;
-  gap: 1rem;
-  align-items: center;
-  padding: 1.15rem;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 59, 59, 0.45);
-  background:
-    radial-gradient(400px 180px at 0% 0%, rgba(255, 59, 59, 0.16), transparent 60%),
-    rgba(16, 14, 24, 0.9);
-}
-
-.monogram {
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-family: var(--display);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  border: 2px solid var(--red);
-  box-shadow: 0 0 22px rgba(255, 59, 59, 0.4);
-  background: radial-gradient(circle at 35% 30%, #3a1428, #120810 70%);
-}
-
-.role {
-  margin: 0.2rem 0 0.85rem;
-  color: var(--gold);
-  font-weight: 700;
-}
-
-.founder-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.founder-links a {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-}
 
 .site-footer {
   padding: 2rem 0 2.4rem;
@@ -768,8 +716,7 @@ h2 {
   .btn:hover .arrow { transform: translateX(4px); }
   .card:hover { transform: translateY(-4px); border-color: rgba(126, 246, 255, 0.45); }
   .place:hover,
-  .social:hover,
-  .founder-links a:hover { transform: translateY(-2px); border-color: rgba(126, 246, 255, 0.5); }
+  .social:hover { transform: translateY(-2px); border-color: rgba(126, 246, 255, 0.5); }
   .site-footer .mark-row a:hover { color: var(--ink); }
 }
 
@@ -784,7 +731,6 @@ h2 {
   .card-featured .cover { aspect-ratio: auto; min-height: 100%; }
   .place-grid,
   .social-grid { grid-template-columns: 1fr 1fr; }
-  .founder { grid-template-columns: auto 1fr; padding: 1.4rem 1.5rem; }
   .footer-grid { grid-template-columns: 1.3fr 1fr 1fr; align-items: start; }
 }
 
