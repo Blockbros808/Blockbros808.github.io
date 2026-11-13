@@ -754,7 +754,13 @@ h2 {
   }
   .site-nav a { padding-inline: 0.7rem; }
   .site-nav .nav-cta { margin-left: 0.35rem; }
+  .site-nav .nav-extra { display: none; }
   body.nav-open { overflow: auto; }
+}
+
+@media (min-width: 980px) and (max-width: 1199px) {
+  .site-nav a { padding-inline: 0.45rem; }
+  .site-nav .nav-cta { font-size: 0.92rem; }
 }
 
 @media (min-width: 1040px) {
